@@ -1,15 +1,25 @@
 package main
 
 import (
+	"time"
 	"log"
 	"net"
 )
 
 func handleRequest(conn net.Conn) {
-	b := make(chan []byte);
-	conn.Read(b);
-	s := []byte{'a', '\n'};
-	conn.Write(s);
+	b := make([]byte, 10);
+	a, err := conn.Read(b);
+
+	if (err != nil) {
+		log.Fatal(err);
+	}
+
+	log.Print(a);
+	log.Print("CHRACTER ", string(b));
+
+	// s := []byte{'a', '\n'};
+	// log.Print(s);
+	conn.Write(b);
 }
 
 func main() {
@@ -17,9 +27,16 @@ func main() {
 	if (err != nil) {
 		log.Fatal(err);
 	}
+
 	conn, err := listener.Accept();
+	log.Print(conn.RemoteAddr());
 	if (err != nil) {
 		log.Fatal(err);
 	}
-	go handleRequest(conn);
+
+	for {
+		handleRequest(conn);
+	}
+
+	time.Sleep(time.Second);
 }
